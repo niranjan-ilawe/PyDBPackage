@@ -1,7 +1,7 @@
 import psycopg2
 import sys
 
-def initialize_form_db(db_name):
+def initialize_db(db_name):
 
     conn = None
     dbs = {
