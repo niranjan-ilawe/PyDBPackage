@@ -27,14 +27,14 @@ The package should now be available for use in python
 
 1. *initialize_db*
 
-`from pydb import initialize_db
-con = initialize_db(dbname = "postgres")`
+`from pydb import initialize_db`
+`con = initialize_db(dbname = "postgres")`
 
 This function creates a connection to the **cpdda** database. The `dbname` variable tells the function which DB to connect to. The function returns a connection object that can be used in the python code to run queries against the database.
 
 2. *batch_upload_df*
 
-`from pydb import batch_upload_df
-res = batch_upload_df(conn = con, df = df, tablename = 'test.ipt')`
+`from pydb import batch_upload_df`
+`res = batch_upload_df(conn = con, df = df, tablename = 'test.ipt')`
 
 Given a pandas dataframe, connection object, and a name of a table in the connection database, this function will upload the dataframe to the table. The table name given needs to exist. The function is not very intelligent in terms of matching types and checking for constraints.
