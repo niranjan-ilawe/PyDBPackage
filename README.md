@@ -1,12 +1,12 @@
 # pydb
-* v0.0.1
+* v0.0.2
 ---
-The *pydb* python package was created to simplify connecting to the **cpdda** database and also provide some basic database utilities such as database upload via python.
+The *pydb* python package was created to simplify connecting to the 10X databases and also provide some basic database utilities such as database upload via python.
 
 ## Functions
 
 Currently the *pydb* package contains 2 functions
-1. initialize_db
+1. get_postgres_connection
 2. batch_upload_df
 
 The usage of these functions are explained below
@@ -25,14 +25,14 @@ The package should now be available for use in python
 
 ## Usage
 
-1. *initialize_db*
+1. *get_postgres_connection*
 
 ```
 from pydb import initialize_db
-con = initialize_db(dbname = "postgres")
+con = get_postgres_connection(db_name="cpdda", service_name="cpdda-postgres", username="cpdda")
 ```
 
-This function creates a connection to the **cpdda** database. The `dbname` variable tells the function which DB to connect to. The function returns a connection object that can be used in the python code to run queries against the database.
+This function creates a connection to the **cpdda** database. The `db_name` variable tells the function which DB to connect to. The `service_name` and `username` are passed on to the keyring function to retrieve the password. The function returns a connection object that can be used in the python code to run queries against the database.
 
 2. *batch_upload_df*
 
