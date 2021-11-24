@@ -2,14 +2,20 @@ import psycopg2.extras as extras
 import psycopg2
 
 
-def batch_upload_df(conn, df, tablename, page_size=100):
+def batch_upload_df(
+    conn, df, tablename, page_size=100, insert_type="insert_only", key_cols="wo"
+):
     """Uploads a pandas dataframe to specificied table
 
     Parameters:
         conn (connection object): Connection object to the database where tablename exists
         df (DataFrame): Pandas dataframe object
-        tablename (string): table where data is to be uploaded
-        page_size (int): default 100, batch size of page uploads
+        tablename (str): table where data is to be uploaded
+        page_size (int): Default 100, batch size of page uploads
+        insert_type (str): Can take "insert_only" (just inserts),
+                           "update" (overwrites existing data and adds new data based on the key_cols),
+                           "refresh" (deletes everything in the table and inserts new data)
+        key_cols (str): Column to be considered as the PK for getting unique rows
 
     Returns:
         result (int): 0 if successful, 1 if error
@@ -18,6 +24,26 @@ def batch_upload_df(conn, df, tablename, page_size=100):
         The DataFrame must have the exact columns as the table where data is to be uploaded
 
     """
+
+    if len(df) < 1:
+        print("Empty dataframe. Nothing to upload")
+        return 0
+
+    cursor = conn.cursor()
+
+    if insert_type == "update":
+        new_wo = tuple(df.wo.unique().astype(str))
+
+        if len(new_wo) <= 1:
+            cursor.execute(f"DELETE FROM {tablename} WHERE {key_cols} = '{new_wo[0]}';")
+            conn.commit()
+        else:
+            cursor.execute(f"DELETE FROM {tablename} WHERE {key_cols} IN {new_wo};")
+            conn.commit()
+
+    if insert_type == "refresh":
+        cursor.execute(f"DELETE FROM {tablename};")
+        conn.commit()
 
     # Get raw data into a list of tuples
     tuples = [tuple(x) for x in df.to_numpy()]
@@ -31,7 +57,6 @@ def batch_upload_df(conn, df, tablename, page_size=100):
 
     # create the actual SQL string
     query = f"INSERT INTO {tablename}({cols}) VALUES ({str_replacements})"
-    cursor = conn.cursor()
 
     # try executing the SQL
     try:
@@ -44,6 +69,6 @@ def batch_upload_df(conn, df, tablename, page_size=100):
         cursor.close()
         return 1
 
-    print("execute_batch() done")
+    print("Data uploaded successfully")
     cursor.close()
     return 0
