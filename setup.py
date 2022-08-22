@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="pydb",
-    version="0.0.2",
+    version="0.0.3",
     description="Python package for querying 10X DBs",
     url="https://github.com/niranjan-ilawe/PyDBPackage",
     author="niranjan.ilawe",
